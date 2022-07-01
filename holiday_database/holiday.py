@@ -1,15 +1,17 @@
 from sqlalchemy import Column, String, Integer, Date, DateTime, ForeignKey, Numeric
 from base import Base
 from sqlalchemy.orm import relationship
+from employee import Employee
+from manager import Manager
 
 class Holiday(Base):
     __tablename__ = 'holidays'
 
     id = Column(Integer, primary_key=True)
     employee_id = Column(Integer, ForeignKey('employees.id'))
-    employee = relationship('Employee')
+    employee = relationship(Employee, backref='holidays')
     manager_id = Column(Integer, ForeignKey('managers.id'))
-    manager = relationship('Manager')
+    manager = relationship(Manager, backref='holidays')
     status = Column(String)
     created_at_date = Column(Date)
     holiday_start_date = Column(DateTime)
