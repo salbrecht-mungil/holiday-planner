@@ -1,8 +1,8 @@
 from datetime import date, datetime
 from base import Session, engine, Base
 
-from employee import Employee
 from manager import Manager
+from employee import Employee
 from holiday import Holiday
 
 # Generate database schema

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer, Date, DateTime, ForeignKey, Numeric
-from .base import Base
+from base import Base
 from sqlalchemy.orm import relationship
 
 class Holiday(Base):

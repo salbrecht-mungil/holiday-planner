@@ -1,0 +1,1 @@
+postgresConn =('postgresql://usr:pass@localhost:5432/sqlalchemy')
