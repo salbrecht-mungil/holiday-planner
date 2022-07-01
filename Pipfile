@@ -5,7 +5,15 @@ name = "pypi"
 
 [packages]
 flask = "*"
-db-sqlite3 = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+flask-sqlalchemy = "*"
+flask-restful = "*"
+flask-marshmallow = "*"
+marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+module-name = "*"
+requests = "*"
 
 [dev-packages]
 
