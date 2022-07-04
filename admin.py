@@ -2,12 +2,8 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_restful import Api, Resource
-# from holiday_planner.holiday_database.base import Session, engine, Base
-
-# from holiday_database.holiday import Holiday
-# , base, employee, manager
-
 from .config import postgresConn
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = postgresConn
@@ -46,15 +42,22 @@ class Holiday(db.Model):
     holiday_end_date = db.Column(db.DateTime)
     number_of_holidays = db.Column(db.Numeric)
 
-@app.route('/holidays')
-def get_holidays_by_status():
+@app.route('/pending-holidays')
+def get_pending_holidays():
         try:
-                pending_requests = Holiday.query.filter_by(status='pending').order_by(Holiday.created_at_date).all()
-                pending_requests_text = '<ul>'
-                for req in pending_requests:
-                        pending_requests_text += '<li>' + str(req.employee_id) + ', ' + str(req.holiday_start_date) + ', ' + str(req.holiday_end_date) + '</li>'
-                pending_requests_text += '</ul>'
-                return pending_requests_text
+                pending_holiday_request = Holiday.query.filter_by(status='pending').order_by(Holiday.created_at_date).all()
+                for req in pending_holiday_request:
+                        pending_holidays = jsonify(
+                                id=str(req.id), 
+                                author=str(req.employee_id), 
+                                status=str(req.status), 
+                                resolved_by=str(req.manager_id), 
+                                request_created_at=str(req.created_at_date), 
+                                vacation_start_date=str(req.holiday_start_date), 
+                                vacation_end_date=str(req.holiday_end_date),
+                                number_of_days_requested=str(req.number_of_holidays)
+                                )
+                return pending_holidays
         except Exception as e:
                 # e holds description of the error
                 error_text = "<p>The error:<br>" + str(e) + "</p>"
