@@ -16,7 +16,6 @@ class Holiday(Base):
     created_at_date = Column(Date)
     holiday_start_date = Column(DateTime)
     holiday_end_date = Column(DateTime)
-    number_of_holidays = Column(Numeric)
 
     def __init__(self, status, created_at_date, holiday_start_date, holiday_end_date, employee, manager, number_of_holidays):
         self.status = status

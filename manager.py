@@ -38,7 +38,6 @@ def get_holidays(page=1):
     created_at_date = args.get('created_at_date')
     holiday_start_date = args.get('holiday_start_date')
     holiday_end_date = args.get('holiday_end_date')
-    number_of_holidays = args.get('number_of_holidays')
     query = Holiday.query
 
     if id:
@@ -55,8 +54,6 @@ def get_holidays(page=1):
         query = query.filter(Holiday.holiday_start_date == holiday_start_date)
     if holiday_end_date:
         query = query.filter(Holiday.holiday_end_date == holiday_end_date)
-    if number_of_holidays:
-        query = query.filter(Holiday.number_of_holidays == number_of_holidays)
     
     holiday_query = query.order_by(created_at_date).paginate(page, per_page, error_out=False)
     filtered_holiday_request = holiday_query.items
@@ -69,8 +66,7 @@ def get_holidays(page=1):
             'resolved_by': req.manager_id, 
             'request_created_at': req.created_at_date, 
             'vacation_start_date': req.holiday_start_date, 
-            'vacation_end_date': req.holiday_end_date,
-            'number_of_days_requested': req.number_of_holidays
+            'vacation_end_date': req.holiday_end_date
         }
         filtered_holiday_list.append(filtered_holidays)
 

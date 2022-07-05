@@ -1,9 +1,11 @@
+from time import strftime, strptime
 from flask import Flask, jsonify, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from .config import postgresConn
 from werkzeug.exceptions import HTTPException
 from .model import Holiday
+from datetime import datetime, date, timedelta
 
 import json
 
@@ -12,6 +14,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = postgresConn
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
+
+
+class RemainingHolidays():
+
+    pass
 
 
 @app.errorhandler(HTTPException)
@@ -49,7 +57,38 @@ def get_holiday_request():
     request_query = query.paginate(page, per_page, False)
     filtered_query = request_query.items
     filtered_query_list = []
+    holidays_taken_list = []
     for req in filtered_query:
+        year_start = datetime.now().date().replace(month=1, day=1)
+        holiday_start_date = req.holiday_start_date.date()
+        holiday_end_date = req.holiday_end_date.date()
+        start_to_beginning_of_year = abs((holiday_start_date - year_start).days)
+        end_to_beginning_of_year = abs((holiday_end_date - year_start).days)
+
+        # Case: holiday starts within new calendar year
+        if start_to_beginning_of_year >= 0:
+            if req.status == 'approved':
+                holidays_taken = abs((holiday_end_date - holiday_start_date).days)
+                holidays_taken_list.append(holidays_taken)
+                holiday_sum = sum(holidays_taken_list)
+            if req.status == 'pending':
+                holidays_taken = abs((holiday_end_date - holiday_start_date).days)
+                holidays_taken_list.append(holidays_taken)
+                holiday_sum = sum(holidays_taken_list)
+
+        # Case: holiday starts in previous calendar year. Only the days in the current year will be deducted from the leave.
+        elif start_to_beginning_of_year < 0 and end_to_beginning_of_year >= 0:
+            if req.status == 'approved':
+                holidays_taken = abs((holiday_end_date - year_start).days)
+                holidays_taken_list.append(holidays_taken)
+                holiday_sum = sum(holidays_taken_list)
+            if req.status == 'pending':
+                holidays_taken = abs((holiday_end_date - year_start).days)
+                holidays_taken_list.append(holidays_taken)
+                holiday_sum = sum(holidays_taken_list)
+
+        remaining_holidays = 30 - holiday_sum
+
         filtered_requests = {
             'id': req.id,
             'author': req.employee_id, 
@@ -58,11 +97,11 @@ def get_holiday_request():
             'request_created_at': req.created_at_date, 
             'vacation_start_date': req.holiday_start_date, 
             'vacation_end_date': req.holiday_end_date,
-            'number_of_days_requested': req.number_of_holidays
+            'remaining_holidays': remaining_holidays
         }
         filtered_query_list.append(filtered_requests)
-
-    return jsonify(result = filtered_query_list)
+            
+    return jsonify(result = filtered_query_list) 
 
 @app.route('/holiday-requests', methods=["POST"])
 def post_holiday_request():
@@ -73,9 +112,8 @@ def post_holiday_request():
     created_at_date = data['request_created_at']
     holiday_start_date = data['vacation_start_date']
     holiday_end_date = data['vacation_end_date']
-    number_of_holidays = data['number_of_days_requested']
                                 
-    new_request = Holiday(employee_id=employee_id, status=status, manager_id=manager_id, created_at_date=created_at_date, holiday_start_date=holiday_start_date, holiday_end_date=holiday_end_date, number_of_holidays=number_of_holidays)
+    new_request = Holiday(employee_id=employee_id, status=status, manager_id=manager_id, created_at_date=created_at_date, holiday_start_date=holiday_start_date, holiday_end_date=holiday_end_date)
         
     db.session.add(new_request)
     db.session.commit()

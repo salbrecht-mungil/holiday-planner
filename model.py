@@ -27,4 +27,3 @@ class Holiday(db.Model):
     created_at_date = db.Column(db.DateTime)
     holiday_start_date = db.Column(db.DateTime)
     holiday_end_date = db.Column(db.DateTime)
-    number_of_holidays = db.Column(db.Numeric)
