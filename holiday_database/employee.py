@@ -10,7 +10,6 @@ class Employee(Base):
     manager_id = Column(Integer, ForeignKey('managers.id'))
     manager = relationship(Manager, backref='employees')
     
-
     def __init__(self, name, manager):
         self.name = name
         self.manager = manager

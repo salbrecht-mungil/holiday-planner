@@ -1,9 +1,9 @@
-from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from .config import postgresConn
 from werkzeug.exceptions import HTTPException
+from .model import Holiday
 
 import json
 
@@ -12,31 +12,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = postgresConn
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-
-class Manager(db.Model):
-    __tablename__ = 'managers'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-
-class Employee(db.Model):
-    __tablename__ = 'employees'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    manager_id = db.Column(db.Integer, db.ForeignKey('managers.id'))
-    manager = db.relationship(Manager, backref='employees')
-
-class Holiday(db.Model):
-    __tablename__ = 'holidays'
-    id = db.Column(db.Integer, primary_key=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employees.id'))
-    employee = db.relationship(Employee, backref='holidays')
-    manager_id = db.Column(db.Integer, db.ForeignKey('managers.id'))
-    manager = db.relationship(Manager, backref='holidays')
-    status = db.Column(db.String)
-    created_at_date = db.Column(db.DateTime)
-    holiday_start_date = db.Column(db.DateTime)
-    holiday_end_date = db.Column(db.DateTime)
-    number_of_holidays = db.Column(db.Numeric)
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -51,29 +26,11 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
-@app.route('/holiday-requests', methods=["POST"])
-def post_holiday_request():
-    data = json.loads(request.get_data())
-    employee_id = data['author']
-    status = data['status'] 
-    manager_id = data['resolved_by']
-    created_at_date = data['request_created_at']
-    holiday_start_date = data['vacation_start_date']
-    holiday_end_date = data['vacation_end_date']
-    number_of_holidays = data['number_of_days_requested']
-                                
-    new_request = Holiday(employee_id=employee_id, status=status, manager_id=manager_id, created_at_date=created_at_date, holiday_start_date=holiday_start_date, holiday_end_date=holiday_end_date, number_of_holidays=number_of_holidays)
-        
-    db.session.add(new_request)
-    db.session.commit()
-
-    return "Request has been added to the database", 201
-
-@app.route('/holidays', methods=['GET'])
-def get_holidays():
+@app.route('/holidays/<int:page>', methods=['GET'])
+def get_holidays(page=1):
     args = request.args
     page = args.get('page')
-    per_page = 5
+    per_page = 10
     id = args.get('id')
     employee_id = args.get('employee_id')
     manager_id = args.get('manager_id')
@@ -101,7 +58,7 @@ def get_holidays():
     if number_of_holidays:
         query = query.filter(Holiday.number_of_holidays == number_of_holidays)
     
-    holiday_query = query.order_by(created_at_date).paginate(page, per_page, False)
+    holiday_query = query.order_by(created_at_date).paginate(page, per_page, error_out=False)
     filtered_holiday_request = holiday_query.items
     filtered_holiday_list = []
     for req in filtered_holiday_request:
