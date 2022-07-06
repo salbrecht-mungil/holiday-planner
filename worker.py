@@ -67,27 +67,25 @@ def get_holiday_request():
 
         # Case: holiday starts within new calendar year
         if start_to_beginning_of_year >= 0:
-            if req.status == 'approved':
+            if req.status == 'approved' or req.status == 'pending':
                 holidays_taken = abs((holiday_end_date - holiday_start_date).days)
                 holidays_taken_list.append(holidays_taken)
                 holiday_sum = sum(holidays_taken_list)
-            if req.status == 'pending':
-                holidays_taken = abs((holiday_end_date - holiday_start_date).days)
-                holidays_taken_list.append(holidays_taken)
-                holiday_sum = sum(holidays_taken_list)
-
+            else:
+                holiday_sum = 0
+            remaining_holidays = 30 - holiday_sum
         # Case: holiday starts in previous calendar year. Only the days in the current year will be deducted from the leave.
         elif start_to_beginning_of_year < 0 and end_to_beginning_of_year >= 0:
-            if req.status == 'approved':
+            if req.status == 'approved' or req.status == 'pending':
                 holidays_taken = abs((holiday_end_date - year_start).days)
                 holidays_taken_list.append(holidays_taken)
                 holiday_sum = sum(holidays_taken_list)
-            if req.status == 'pending':
-                holidays_taken = abs((holiday_end_date - year_start).days)
-                holidays_taken_list.append(holidays_taken)
-                holiday_sum = sum(holidays_taken_list)
-
-        remaining_holidays = 30 - holiday_sum
+            else:
+                holiday_sum = 0
+            remaining_holidays = 30 - holiday_sum
+        # Case: holidays booked for previous year(s)
+        else:
+            remaining_holidays = 0
 
         filtered_requests = {
             'id': req.id,
