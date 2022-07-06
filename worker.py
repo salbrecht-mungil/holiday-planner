@@ -1,11 +1,10 @@
-from time import strftime, strptime
 from flask import Flask, jsonify, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from .config import postgresConn
 from werkzeug.exceptions import HTTPException
 from .model import Holiday
-from datetime import datetime, date, timedelta
+from datetime import datetime
 
 import json
 
@@ -14,13 +13,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = postgresConn
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-
-
-
-class RemainingHolidays():
-
-    pass
-
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -105,14 +97,53 @@ def get_holiday_request():
 def post_holiday_request():
     data = json.loads(request.get_data())
     employee_id = data['author']
+
+    past_holiday_query = Holiday.query.filter(Holiday.employee_id == employee_id).order_by('created_at_date').all() 
+    holidays_taken_list = []
+    for item in past_holiday_query:
+        year_start = datetime.now().date().replace(month=1, day=1)
+        holiday_start_date = item.holiday_start_date.date()
+        holiday_end_date = item.holiday_end_date.date()
+        start_to_beginning_of_year = abs((holiday_start_date - year_start).days)
+        end_to_beginning_of_year = abs((holiday_end_date - year_start).days)
+
+        # Case: holiday starts within new calendar year
+        if start_to_beginning_of_year >= 0:
+            if item.status == 'approved' or item.status == 'pending':
+                holidays_taken = abs((holiday_end_date - holiday_start_date).days)
+                holidays_taken_list.append(holidays_taken)
+                holiday_sum = sum(holidays_taken_list)
+            else:
+                holiday_sum = 0
+            remaining_holidays = 30 - holiday_sum
+        # Case: holiday starts in previous calendar year. Only the days in the current year will be deducted from the leave.
+        elif start_to_beginning_of_year < 0 and end_to_beginning_of_year >= 0:
+            if item.status == 'approved' or item.status == 'pending':
+                holidays_taken = abs((holiday_end_date - year_start).days)
+                holidays_taken_list.append(holidays_taken)
+                holiday_sum = sum(holidays_taken_list)
+            else:
+                holiday_sum = 0
+            remaining_holidays = 30 - holiday_sum
+        # Case: holidays booked for previous year(s)
+        else:
+            remaining_holidays = 0
+
     status = data['status'] 
     manager_id = data['resolved_by']
     created_at_date = data['request_created_at']
-    holiday_start_date = data['vacation_start_date']
-    holiday_end_date = data['vacation_end_date']
-                                
-    new_request = Holiday(employee_id=employee_id, status=status, manager_id=manager_id, created_at_date=created_at_date, holiday_start_date=holiday_start_date, holiday_end_date=holiday_end_date)
-        
+    holiday_start_date_req = data['vacation_start_date']
+    holiday_end_date_req = data['vacation_end_date']
+    number_of_hol_requested = abs((datetime.strptime(holiday_end_date_req, "%Y-%m-%d")  - datetime.strptime(holiday_start_date_req, "%Y-%m-%d")).days)
+
+    if remaining_holidays > 0:
+        if number_of_hol_requested <= remaining_holidays:                        
+            new_request = Holiday(employee_id=employee_id, status=status, manager_id=manager_id, created_at_date=created_at_date, holiday_start_date=holiday_start_date_req, holiday_end_date=holiday_end_date_req)
+        else:
+            abort(401, "Not enough holidays left. Change your holiday_end_date")
+    else:
+        abort(401, "No holidays left")
+
     db.session.add(new_request)
     db.session.commit()
 
