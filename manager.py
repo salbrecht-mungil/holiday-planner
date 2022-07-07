@@ -24,13 +24,16 @@ def handle_exception(e):
         "description": e.description,
     })
     response.content_type = "application/json"
+    
     return response
 
-@app.route('/holidays/<int:page>', methods=['GET'])
-def get_holidays(page=1):
+# List all holiday requests filterable by any of the column names of the holiday table.
+# Return whether request overlaps with other approved or pending requests 
+@app.route('/holidays', methods=['GET'])
+def get_holidays():
     args = request.args
-    page = args.get('page')
-    per_page = 10
+    page = args.get('page', type=int, default=1)
+    per_page = 5
     id = args.get('id')
     employee_id = args.get('employee_id')
     manager_id = args.get('manager_id')
@@ -55,7 +58,7 @@ def get_holidays(page=1):
     if holiday_end_date:
         query = query.filter(Holiday.holiday_end_date == holiday_end_date)
     
-    holiday_query = query.order_by(created_at_date).paginate(page, per_page, error_out=False)
+    holiday_query = query.order_by(created_at_date).paginate(page, per_page, False)
     filtered_holiday_request = holiday_query.items
     filtered_holiday_list = []
     for req in filtered_holiday_request:
@@ -72,6 +75,55 @@ def get_holidays(page=1):
 
     return jsonify(result = filtered_holiday_list)
 
+# Get a list of objects showing requests with overlapping dates
+@app.route('/overlapping-requests', methods=['GET'])
+def get_overlapping_requests():
+    # Fetch all requests in database with pending or approved status
+    query_approved_and_pending = Holiday.query.filter(Holiday.status != 'rejected').all() 
+    overlapping_days_list = []
+    for i in query_approved_and_pending:
+        i_start_date = i.holiday_start_date
+        i_end_date = i.holiday_end_date
+        for j in query_approved_and_pending:
+            if i != j:
+                j_start_date = j.holiday_start_date
+                j_end_date = j.holiday_end_date
+                # Case: The processed holiday request has start date set before the start date of the item it gets compared to.
+                if i_start_date < j_start_date:
+                    # Case: The processed holiday request has end date set before the start date of the item it gets compared to. No overlap
+                    if i_end_date < j_start_date:
+                        overlapping_days = {
+                            'holiday_id_one': i.id,
+                            'holiday_id_two': j.id,
+                            'overlap': False
+                        }
+                    # Case: The processed holiday request has end date set after the start date of the item it gets compared to. Overlap    
+                    else:
+                        overlapping_days = {
+                            'holiday_id_one': i.id,
+                            'holiday_id_two': j.id,
+                            'overlap': True
+                        }
+                        overlapping_days_list.append(overlapping_days)
+                # Case: The processed holiday request has start and end date set within the range of start and end date of the item it gets compared to.  
+                if i_start_date >= j_start_date and i_start_date <= j_end_date:
+                        overlapping_days = {
+                            'holiday_id_one': i.id,
+                            'holiday_id_two': j.id,
+                            'overlap': True
+                        }
+                        overlapping_days_list.append(overlapping_days)
+                # Case: The processed holiday request has start and end date set after the end date of the item it gets compared to.
+                else:
+                    overlapping_days = {
+                        'holiday_id_one': i.id,
+                        'holiday_id_two': j.id,
+                        'overlap': False
+                    }
+    
+    return jsonify(result = overlapping_days_list)    
+
+# Update a particular holiday request
 @app.route('/holidays/<int:holiday_id>', methods=['PATCH'])
 def update_holiday(holiday_id):
     data = json.loads(request.get_data())
@@ -79,7 +131,7 @@ def update_holiday(holiday_id):
                                 
     update_request = Holiday.query.get(holiday_id)
     update_request.status = status
-        
+
     db.session.add(update_request)
     db.session.commit()
 

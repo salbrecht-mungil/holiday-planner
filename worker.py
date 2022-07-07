@@ -1,4 +1,3 @@
-from email.policy import default
 from flask import Flask, jsonify, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -28,8 +27,8 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
-# List all the holidays requests for a particular employee_id - this would normally be retrieved from the logging in page
-# Returns the number of holidays left if the request was approved
+# List all the holiday requests for a particular employee_id - this would normally be retrieved from the logging in page
+# Return the number of holidays left if the request was approved
 # Constraints: 
 #   - annual leave is calculated per calendar year
 #   - holidays can not be taken over into new year
