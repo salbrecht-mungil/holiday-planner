@@ -1,3 +1,4 @@
+from email.policy import default
 from flask import Flask, jsonify, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -30,11 +31,14 @@ def handle_exception(e):
 @app.route('/holiday-requests', methods=['GET'])
 def get_holiday_request():
     args = request.args
-    page = args.get('page')
+    page = args.get('page', type=int, default=1)
     per_page = 5
     status = args.get('status')
     employee_id = args.get('employee_id')
     query = Holiday.query
+
+    print(page)
+    print(type(page))
 
     if status:
         if employee_id:
