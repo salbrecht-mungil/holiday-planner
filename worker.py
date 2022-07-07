@@ -28,6 +28,11 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
+# List all the holidays requests for a particular employee_id - this would normally be retrieved from the logging in page
+# Returns the number of holidays left if the request was approved
+# Constraints: 
+#   - annual leave is calculated per calendar year
+#   - holidays can not be taken over into new year
 @app.route('/holiday-requests', methods=['GET'])
 def get_holiday_request():
     args = request.args
@@ -36,9 +41,6 @@ def get_holiday_request():
     status = args.get('status')
     employee_id = args.get('employee_id')
     query = Holiday.query
-
-    print(page)
-    print(type(page))
 
     if status:
         if employee_id:
@@ -97,11 +99,13 @@ def get_holiday_request():
             
     return jsonify(result = filtered_query_list) 
 
+# Creating a new holiday request in case there are enough days left to take  
 @app.route('/holiday-requests', methods=["POST"])
 def post_holiday_request():
     data = json.loads(request.get_data())
     employee_id = data['author']
 
+    # Calculating the holidays remaining for the year
     past_holiday_query = Holiday.query.filter(Holiday.employee_id == employee_id).order_by('created_at_date').all() 
     holidays_taken_list = []
     for item in past_holiday_query:
@@ -133,6 +137,7 @@ def post_holiday_request():
         else:
             remaining_holidays = 0
 
+    # Creating a request if requested amount of days is < or = remaining holidays 
     status = data['status'] 
     manager_id = data['resolved_by']
     created_at_date = data['request_created_at']
