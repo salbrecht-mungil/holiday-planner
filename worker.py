@@ -139,7 +139,7 @@ def post_holiday_request():
     # Creating a request if requested amount of days is < or = remaining holidays 
     status = 'pending' 
     manager_id = data['resolved_by']
-    created_at_date = data['request_created_at']
+    created_at_date = datetime.now()
     holiday_start_date_req = data['vacation_start_date']
     holiday_end_date_req = data['vacation_end_date']
     number_of_hol_requested = abs((datetime.strptime(holiday_end_date_req, "%Y-%m-%d")  - datetime.strptime(holiday_start_date_req, "%Y-%m-%d")).days)
