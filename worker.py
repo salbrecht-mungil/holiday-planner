@@ -1,18 +1,10 @@
-from flask import Flask, jsonify, request, abort
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
-from .config import postgresConn
+from flask import jsonify, request, abort
 from werkzeug.exceptions import HTTPException
-from .model import Holiday
+from .model import Holiday, Employee
 from datetime import datetime
+from .config import app, db
 
 import json
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = postgresConn
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -39,64 +31,67 @@ def get_holiday_request():
     per_page = 5
     status = args.get('status')
     employee_id = args.get('employee_id')
-    query = Holiday.query
+    employee_exists = bool(Employee.query.filter_by(id=employee_id).first())
 
-    if status:
-        if employee_id:
-            query = query.filter(Holiday.status == status, Holiday.employee_id == employee_id)
-        else:
-            abort(401)            
-    elif employee_id:
-        query = query.filter(Holiday.employee_id == employee_id)
+    if employee_exists == False:
+        return abort(401)
     else:
-        abort(401)
-    
-    request_query = query.paginate(page, per_page, False)
-    filtered_query = request_query.items
-    filtered_query_list = []
-    holidays_taken_list = []
-    for req in filtered_query:
-        year_start = datetime.now().date().replace(month=1, day=1)
-        holiday_start_date = req.holiday_start_date.date()
-        holiday_end_date = req.holiday_end_date.date()
-        start_to_beginning_of_year = abs((holiday_start_date - year_start).days)
-        end_to_beginning_of_year = abs((holiday_end_date - year_start).days)
-
-        # Case: holiday starts within new calendar year
-        if start_to_beginning_of_year >= 0:
-            if req.status == 'approved' or req.status == 'pending':
-                holidays_taken = abs((holiday_end_date - holiday_start_date).days)
-                holidays_taken_list.append(holidays_taken)
-                holiday_sum = sum(holidays_taken_list)
+        if status:
+            if employee_id:
+                query = Holiday.query.filter(Holiday.status == status, Holiday.employee_id == employee_id)
             else:
-                holiday_sum = 0
-            remaining_holidays = 30 - holiday_sum
-        # Case: holiday starts in previous calendar year. Only the days in the current year will be deducted from the leave.
-        elif start_to_beginning_of_year < 0 and end_to_beginning_of_year >= 0:
-            if req.status == 'approved' or req.status == 'pending':
-                holidays_taken = abs((holiday_end_date - year_start).days)
-                holidays_taken_list.append(holidays_taken)
-                holiday_sum = sum(holidays_taken_list)
-            else:
-                holiday_sum = 0
-            remaining_holidays = 30 - holiday_sum
-        # Case: holidays booked for previous year(s)
+                abort(401)            
+        elif employee_id:
+            query = Holiday.query.filter(Holiday.employee_id == employee_id)
         else:
-            remaining_holidays = 0
+            abort(401)
+        
+        request_query = query.paginate(page, per_page, False)
+        filtered_query = request_query.items
+        filtered_query_list = []
+        holidays_taken_list = []
+        for req in filtered_query:
+            year_start = datetime.now().date().replace(month=1, day=1)
+            holiday_start_date = req.holiday_start_date.date()
+            holiday_end_date = req.holiday_end_date.date()
+            start_to_beginning_of_year = abs((holiday_start_date - year_start).days)
+            end_to_beginning_of_year = abs((holiday_end_date - year_start).days)
 
-        filtered_requests = {
-            'id': req.id,
-            'author': req.employee_id, 
-            'status': req.status, 
-            'resolved_by': req.manager_id, 
-            'request_created_at': req.created_at_date, 
-            'vacation_start_date': req.holiday_start_date, 
-            'vacation_end_date': req.holiday_end_date,
-            'remaining_holidays': remaining_holidays
-        }
-        filtered_query_list.append(filtered_requests)
-            
-    return jsonify(result = filtered_query_list) 
+            # Case: holiday starts within new calendar year
+            if start_to_beginning_of_year >= 0:
+                if req.status == 'approved' or req.status == 'pending':
+                    holidays_taken = abs((holiday_end_date - holiday_start_date).days)
+                    holidays_taken_list.append(holidays_taken)
+                    holiday_sum = sum(holidays_taken_list)
+                else:
+                    holiday_sum = 0
+                remaining_holidays = 30 - holiday_sum
+            # Case: holiday starts in previous calendar year. Only the days in the current year will be deducted from the leave.
+            elif start_to_beginning_of_year < 0 and end_to_beginning_of_year >= 0:
+                if req.status == 'approved' or req.status == 'pending':
+                    holidays_taken = abs((holiday_end_date - year_start).days)
+                    holidays_taken_list.append(holidays_taken)
+                    holiday_sum = sum(holidays_taken_list)
+                else:
+                    holiday_sum = 0
+                remaining_holidays = 30 - holiday_sum
+            # Case: holidays booked for previous year(s)
+            else:
+                remaining_holidays = 0
+
+            filtered_requests = {
+                'id': req.id,
+                'author': req.employee_id, 
+                'status': req.status, 
+                'resolved_by': req.manager_id, 
+                'request_created_at': req.created_at_date, 
+                'vacation_start_date': req.holiday_start_date, 
+                'vacation_end_date': req.holiday_end_date,
+                'remaining_holidays': remaining_holidays
+            }
+            filtered_query_list.append(filtered_requests)
+                
+        return jsonify(result = filtered_query_list) 
 
 # Creating a new holiday request in case there are enough days left to take  
 @app.route('/holiday-requests', methods=["POST"])

@@ -1,17 +1,9 @@
-from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
-from .config import postgresConn
+from flask import jsonify, request, abort
+from .config import app, db
 from werkzeug.exceptions import HTTPException
-from .model import Holiday
+from .model import Holiday, Employee
 
 import json
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = postgresConn
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -41,12 +33,16 @@ def get_holidays():
     created_at_date = args.get('created_at_date')
     holiday_start_date = args.get('holiday_start_date')
     holiday_end_date = args.get('holiday_end_date')
+    employee_exists = bool(Employee.query.filter_by(id=employee_id).first())
     query = Holiday.query
 
     if id:
         query = query.filter(Holiday.id == id)
     if employee_id:
-        query = query.filter(Holiday.employee_id == employee_id)
+        if employee_exists == True:
+            query = query.filter(Holiday.employee_id == employee_id)
+        else:
+            abort(404)
     if manager_id:
         query = query.filter(Holiday.manager_id == manager_id)
     if status:
@@ -127,7 +123,7 @@ def get_overlapping_requests():
 @app.route('/holidays/<int:holiday_id>', methods=['PATCH'])
 def update_holiday(holiday_id):
     data = json.loads(request.get_data())
-    status = data['status'] 
+    status = data['status']
                                 
     update_request = Holiday.query.get(holiday_id)
     update_request.status = status

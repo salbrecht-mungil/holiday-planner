@@ -1,8 +1,7 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from .config import db
 
 app = Flask(__name__)
-db = SQLAlchemy(app)
 
 class Manager(db.Model):
     __tablename__ = 'managers'
