@@ -1,4 +1,4 @@
-from flask import jsonify, request, abort
+from flask import jsonify, request
 from .config import app, db
 from werkzeug.exceptions import HTTPException
 from .model import Holiday

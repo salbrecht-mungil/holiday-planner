@@ -1,0 +1,322 @@
+{
+	"info": {
+		"_postman_id": "cd30c41b-942a-4510-8c3d-9dfda0e91933",
+		"name": "Holiday Booking API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21385789"
+	},
+	"item": [
+		{
+			"name": "Test Case 1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/holiday-requests?employee_id=4",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holiday-requests"
+					],
+					"query": [
+						{
+							"key": "employee_id",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 3",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/holiday-requests?employee_id=4&status=pending",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holiday-requests"
+					],
+					"query": [
+						{
+							"key": "employee_id",
+							"value": "4"
+						},
+						{
+							"key": "status",
+							"value": "pending"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 4",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"author\": \"1\",\n    \"resolved_by\": \"1\",\n    \"vacation_end_date\": \"2022-11-01\",\n    \"vacation_start_date\": \"2022-11-15\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holiday-requests",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holiday-requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 5",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"author\": \"4\",\n    \"vacation_end_date\": \"2022-08-01\",\n    \"vacation_start_date\": \"2022-08-01\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holiday-requests",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holiday-requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 6",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holidays?page=2",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holidays"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 7",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holidays?status=pending&page=2",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holidays"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "pending"
+						},
+						{
+							"key": "page",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 8",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holidays?employee_id=1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holidays"
+					],
+					"query": [
+						{
+							"key": "employee_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 9",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holidays?employee_id=5",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holidays"
+					],
+					"query": [
+						{
+							"key": "employee_id",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 10",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/overlapping-requests",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"overlapping-requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Case 11",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"approved\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/holidays/12",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"holidays",
+						"12"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
