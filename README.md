@@ -25,8 +25,7 @@ Also, this is only my second project I have written from scratch. Since I had li
 
 - Python3.9
 - pipenv for dependencies
-- Flask for the API using gunicorn
-- Docker for containerisation
+- Flask for the API
 
 # Instructions for running the API
 
@@ -45,15 +44,15 @@ Both APIs currently share port 5000, so you can only run one API at the time - T
 
 ## Endpoints
 - Employees: 
-    GET localhost:5000/holiday-requests
-    POST localhost:5000/holiday-requests
+    - GET localhost:5000/holiday-requests
+    - POST localhost:5000/holiday-requests
 - Managers:
-    GET localhost:5000/holidays
-    GET localhost:5000/overlapping-requests
-    PATCH localhost:5000/holidays/{holiday_id}
+    - GET localhost:5000/holidays
+    - GET localhost:5000/overlapping-requests
+    - PATCH localhost:5000/holidays/{holiday_id}
 
 ## Testing
-I am very well aware that testing is a very important of developing new software and if I had much more time I would certainly look into upskilling in this area. However, since I haven't got much experience in writing proper unit, integration etc tests I decided to only create example requests in Postman representing different test cases for this code test.
+I am very well aware that testing is a very important part of developing new software and if I had much more time I would certainly look into upskilling in this area. However, since I haven't got much experience in writing proper unit, integration etc tests I decided to only create example requests in Postman representing different test cases for this code test.
 
 ## Postman file for example requests
 I have added a Postman collection with example requests representing the following test cases (hopefully it all works without issues for you as well).
