@@ -1,7 +1,7 @@
 from flask import jsonify, request, abort
 from .config import app, db
 from werkzeug.exceptions import HTTPException
-from .model import Holiday, Employee
+from .model import Holiday
 
 import json
 
@@ -33,16 +33,12 @@ def get_holidays():
     created_at_date = args.get('created_at_date')
     holiday_start_date = args.get('holiday_start_date')
     holiday_end_date = args.get('holiday_end_date')
-    employee_exists = bool(Employee.query.filter_by(id=employee_id).first())
     query = Holiday.query
 
     if id:
         query = query.filter(Holiday.id == id)
     if employee_id:
-        if employee_exists == True:
-            query = query.filter(Holiday.employee_id == employee_id)
-        else:
-            abort(404)
+        query = query.filter(Holiday.employee_id == employee_id)
     if manager_id:
         query = query.filter(Holiday.manager_id == manager_id)
     if status:
