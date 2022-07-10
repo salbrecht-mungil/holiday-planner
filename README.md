@@ -6,26 +6,31 @@ Also, this is only my second project I have written from scratch. Since I had li
 
 # Assumptions
 
-- Once the API is connected to a UI certain variables, e.g. employee_id would be retrieved from there.
-- vacation_start_date <= vacation_end_date will be handled through the UI.
-- Annual leave is assigned per calendar year (if this is not the case the calculations would have to be amended)
+- Eventually the API would retrieve certain variables such as the employee_id and manager_id from an authentication layer. For simplicity this is currently represented through query parameters.
+- At present the vacation dates are handled as vacation_start_date <= vacation_end_date.
+- Annual leave is assigned per calendar year (if this is not the case the calculations will have to be amended)
 
-# Steps to build the APIs
+# Planning the assignment
 
-1. Create a database with examples to be able to test code whilst writing.
-    - Create three tables: employees, managers, holidays
-    - Connect tables through relationships: 
+First I was reading about and non-relational or relational databases such as MongoDB and SQL. I decided that an SQL relational database (I chose PostgreSQL) is the most suitable for the assignment since the data are well structured and relationships between tables can easily be formed.
+
+My design for the database contains three tables which are connected through Foreign Keys to represent the following relationships:
         - employees -> managers = Many_To_One
         - employees -> holidays = One_To_Many
         - managers -> holidays = One-To-Many
-2. Create the model(s) for the database - this will be used by both APIs
-3. Create one API for employees and one for managers
+
+To be able to represent my data models with objects and query those entities, I decided to connect the APIs with the database through an Object Relational Mapper. Since SQLAlchemy is well documented I thought this was a suitable tool for my task. 
+
+To start with, I created the folder `holiday_database` containing all files necessary to create a new database containing the three tables with examples. 
+Then I built the model(s) (see `model.py`) for the database which would eventually be used for both APIs.
+Finally I built two APIs, one to be used by employees called `worker.py` and one by managers called `manager.py`.
 
 # Tech stack:
 
 - Python3.9
 - pipenv for dependencies
 - Flask for the API
+- Docker to create PostgreSQL instance
 
 # Instructions for running the API
 
@@ -34,25 +39,24 @@ You will need to have Python3.9 installed along with pip.
 Run the following:
 - Install pipenv for dependencies: `pip install pipenv`
 - Install the required dependencies: `pipenv install`
+- Create a PostgreSQL instance on port 5432: `docker run --name sqlalchemy-orm-psql -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=usr -e POSTGRES_DB=sqlalchemy -p 5432:5432 -d postgres`
 - Navigate to the database folder: `cd holiday_database/`
 - Create and populate tables in PostgreSQL database: `pipenv shell` and then `python inserts.py`
 - Navigate back to the main folder: `cd ..`
-- Run the Employee API: `./bootstrap-worker.sh` (Ctrl+C to quit)
-- Run the Manager API: `./bootstrap-manager.sh` (Ctrl+C to quit)
-
-Both APIs currently share port 5000, so you can only run one API at the time - This will have to be addressed.
+- Run the Employee API: `./bootstrap-worker.sh`
+- Run the Manager API: `./bootstrap-manager.sh`
 
 ## Endpoints
 - Employees: 
-    - GET localhost:5000/holiday-requests
-    - POST localhost:5000/holiday-requests
+    - GET localhost:5050/holiday-requests
+    - POST localhost:5050/holiday-requests
 - Managers:
     - GET localhost:5000/holidays
     - GET localhost:5000/overlapping-requests
     - PATCH localhost:5000/holidays/{holiday_id}
 
 ## Testing
-I am very well aware that testing is a very important part of developing new software and if I had much more time I would certainly look into upskilling in this area. However, since I haven't got much experience in writing proper unit, integration etc tests I decided to only create example requests in Postman representing different test cases for this code test.
+I am very well aware that testing is a crucial part of developing new software and if I had more time I would look into upskilling in this area and add all the required tests to the code. However, since I haven't got much experience in writing tests in a TDD fashion I decided to only create example requests in Postman representing different test cases for this assignment.
 
 ## Postman file for example requests
 I have added a Postman collection with example requests representing the following test cases (hopefully it all works without issues for you as well).
@@ -74,6 +78,9 @@ Test cases:
 - Test Case 11: Make request to change status for particular employee - returns 200 and "Holiday status has been updated"
 
 ## Ideas for improvements
-- Add unit tests and e2e tests to ensure the API can cope with possible scenarios.
-- Add authorization (Auth0) from which employee_id and manager_id can be retrieved.
-- Deploy API to cloud and allow for both APIs to run at the same time
+- Add unit tests and e2e tests to ensure the API can cope with all possible scenarios.
+- Currently database connection is hard-coded. postgresConn would have to be dynamically managed through environment variables. Now that I've come across 12 factor apps during the assignment I would apply those principles which would include configuration of evironment variables.
+- Add an authentication and an authorization layer to secure the API.
+- Add payload validation, e.g. to validate vacation start and end dates.
+- Add a repository pattern such as Docker to manage complexity (e.g. through the Dockerfile), take advantage of re-usability and not having to worry about setting up different environments.
+- Looking into database migrations to handle the set up and maintanance of the database as opposed to how it's been handled in this assignment. 
