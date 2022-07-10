@@ -9,6 +9,7 @@ Also, this is only my second project I have written from scratch. Since I had li
 - Eventually the API would retrieve certain variables such as the employee_id and manager_id from an authentication layer. For simplicity this is currently represented through query parameters.
 - At present the vacation dates are handled as vacation_start_date <= vacation_end_date.
 - Annual leave is assigned per calendar year (if this is not the case the calculations will have to be amended)
+- Remaining holidays can not be taken over into new year.
 
 # Planning the assignment
 
@@ -82,5 +83,6 @@ Test cases:
 - Currently database connection is hard-coded. postgresConn would have to be dynamically managed through environment variables. Now that I've come across 12 factor apps during the assignment I would apply those principles which would include configuration of evironment variables.
 - Add an authentication and an authorization layer to secure the API.
 - Add payload validation, e.g. to validate vacation start and end dates.
+- Implement if and how many left over holidays can be taken over into new year.
 - Add a repository pattern such as Docker to manage complexity (e.g. through the Dockerfile), take advantage of re-usability and not having to worry about setting up different environments.
 - Looking into database migrations to handle the set up and maintanance of the database as opposed to how it's been handled in this assignment. 
