@@ -12,18 +12,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/holiday-requests?employee_id=4",
+					"raw": "localhost:5050/holiday-requests?employee_id=2",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "5050",
 					"path": [
 						"holiday-requests"
 					],
 					"query": [
 						{
 							"key": "employee_id",
-							"value": "4"
+							"value": "2"
 						}
 					]
 				}
@@ -36,22 +36,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/holiday-requests?employee_id=4&status=pending",
+					"raw": "localhost:5050/holiday-requests?employee_id=5",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "5050",
 					"path": [
 						"holiday-requests"
 					],
 					"query": [
 						{
 							"key": "employee_id",
-							"value": "4"
-						},
-						{
-							"key": "status",
-							"value": "pending"
+							"value": "5"
 						}
 					]
 				}
@@ -65,7 +61,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"author\": \"1\",\n    \"resolved_by\": \"1\",\n    \"vacation_end_date\": \"2022-11-01\",\n    \"vacation_start_date\": \"2022-11-15\"\n}",
+					"raw": "{\n    \"author\": \"2\",\n    \"vacation_end_date\": \"2022-10-30\",\n    \"vacation_start_date\": \"2022-10-07\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -73,11 +69,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/holiday-requests",
+					"raw": "localhost:5050/holiday-requests",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "5050",
 					"path": [
 						"holiday-requests"
 					]
@@ -92,7 +88,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"author\": \"4\",\n    \"vacation_end_date\": \"2022-08-01\",\n    \"vacation_start_date\": \"2022-08-01\"\n}",
+					"raw": "{\n    \"author\": \"4\",\n    \"vacation_end_date\": \"2022-09-01\",\n    \"vacation_start_date\": \"2022-09-01\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -100,11 +96,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/holiday-requests",
+					"raw": "localhost:5050/holiday-requests",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "5050",
 					"path": [
 						"holiday-requests"
 					]
@@ -305,14 +301,14 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/holidays/12",
+					"raw": "localhost:5000/holidays/21",
 					"host": [
 						"localhost"
 					],
 					"port": "5000",
 					"path": [
 						"holidays",
-						"12"
+						"21"
 					]
 				}
 			},
