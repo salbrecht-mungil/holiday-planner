@@ -84,5 +84,6 @@ Test cases:
 - Add an authentication and an authorization layer to secure the API.
 - Add payload validation, e.g. to validate vacation start and end dates.
 - Implement if and how many left over holidays can be taken over into new year.
+- Add support for half holidays and also type of holidays.
 - Add a repository pattern such as Docker to manage complexity (e.g. through the Dockerfile), take advantage of re-usability and not having to worry about setting up different environments.
 - Looking into database migrations to handle the set up and maintanance of the database as opposed to how it's been handled in this assignment. 
