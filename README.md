@@ -13,7 +13,7 @@ Also, this is only my second project I have written from scratch. Since I had li
 
 # Planning the assignment
 
-First I was reading about and non-relational or relational databases such as MongoDB and SQL. I decided that an SQL relational database (I chose PostgreSQL) is the most suitable for the assignment since the data are well structured and relationships between tables can easily be formed.
+First I was reading about non-relational and relational databases such as MongoDB and SQL. I decided that an SQL relational database (I chose PostgreSQL) is the most suitable for the assignment since the data are well structured and relationships between tables can easily be formed.
 
 My design for the database contains three tables which are connected through Foreign Keys to represent the following relationships:
         - employees -> managers = Many_To_One
@@ -31,6 +31,7 @@ Finally I built two APIs, one to be used by employees called `worker.py` and one
 - Python3.9
 - pipenv for dependencies
 - Flask for the API
+- SQLAlchemy
 - Docker to create PostgreSQL instance
 
 # Instructions for running the API
